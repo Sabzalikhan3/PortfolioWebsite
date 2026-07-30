@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sabz Ali — Azure Cloud Administrator</title>
+<meta name="description" content="Sabz Ali — Azure Cloud Administrator & DevOps Engineer. I design, secure, and automate cloud infrastructure — IaC, CI/CD, observability, security, and backup/BCDR." />
+<meta name="theme-color" content="#0b1119" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   Change --accent / --accent-2 to re-skin the whole site.
+   ============================================================ */
+:root{
+  --accent:#38bdf8;      /* Azure cyan */
+  --accent-2:#22d3ee;
+  --accent-3:#818cf8;
+  --glow:rgba(56,189,248,.32);
+  --green:#34d399; --amber:#fbbf24; --red:#f87171;
+  --font-sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:ui-monospace,"JetBrains Mono","SF Mono",Menlo,Consolas,"Cascadia Code",monospace;
+  --maxw:1120px;
+  --radius:14px;
+}
+[data-theme="dark"]{
+  --bg:#080b11; --bg-2:#0b1119; --bg-3:#0e1622;
+  --panel:rgba(255,255,255,.035);
+  --panel-solid:#0e1520;
+  --border:rgba(255,255,255,.09);
+  --border-strong:rgba(255,255,255,.16);
+  --text:#e2e8f0; --heading:#f8fafc; --muted:#8895a7; --faint:#5b6675;
+  --grid:rgba(120,160,220,.05);
+  --shadow:0 20px 60px -20px rgba(0,0,0,.7);
+}
+[data-theme="light"]{
+  --bg:#eef2f8; --bg-2:#e7ecf4; --bg-3:#ffffff;
+  --panel:#ffffff;
+  --panel-solid:#ffffff;
+  --border:rgba(15,30,55,.10);
+  --border-strong:rgba(15,30,55,.20);
+  --text:#26313f; --heading:#0f1b2d; --muted:#5b6675; --faint:#94a1b1;
+  --grid:rgba(30,80,160,.05);
+  --shadow:0 20px 50px -24px rgba(20,40,80,.35);
+  --glow:rgba(2,132,199,.22);
+  --accent:#0284c7; --accent-2:#0891b2; --accent-3:#6366f1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{
+  font-family:var(--font-sans);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  transition:background .4s ease,color .4s ease;
+}
+[dir="rtl"] body{font-family:"Noto Nastaliq Urdu",var(--font-sans)}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#04121c}
+
+/* ---------- animated background ---------- */
+.bg-fx{position:fixed;inset:0;z-index:-2;pointer-events:none}
+.bg-fx::before{ /* grid */
+  content:"";position:absolute;inset:-2px;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:52px 52px;
+  mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 40%,transparent 100%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 40%,transparent 100%);
+}
+.bg-fx::after{ /* glow */
+  content:"";position:absolute;top:-15%;left:50%;transform:translateX(-50%);
+  width:900px;height:600px;
+  background:radial-gradient(circle,var(--glow),transparent 65%);
+  filter:blur(20px);opacity:.9;
+}
+.scan{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.4;
+  background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,.04) 3px 4px)}
+[data-theme="light"] .scan{display:none}
+
+/* ---------- layout ---------- */
+.wrap{max-width:var(--maxw);margin:0 auto;padding-inline:24px}
+section{padding:8px 0 12px;position:relative}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--accent);
+  display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;
+}
+.eyebrow::before{content:"";width:22px;height:1px;background:var(--accent);opacity:.6}
+h2.title{font-size:clamp(1.7rem,4vw,2.5rem);color:var(--heading);
+  font-weight:700;letter-spacing:-.02em;line-height:1.1;margin-bottom:14px}
+.section-sub{color:var(--muted);max-width:60ch;margin-bottom:30px}
+
+/* ---------- sidebar nav ---------- */
+:root{--sbw:264px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.sidebar{position:fixed;top:0;inset-inline-start:0;width:var(--sbw);height:100vh;z-index:100;
+  display:flex;flex-direction:column;gap:16px;padding:22px 18px;overflow-y:auto;
+  background:color-mix(in srgb,var(--bg-2) 92%,transparent);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-inline-end:1px solid var(--border);transition:transform .3s ease}
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:6px}
+.brand{font-family:var(--font-mono);font-weight:700;color:var(--heading);
+  display:flex;align-items:center;gap:10px;font-size:.9rem}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 25%,transparent);animation:pulse 2.4s infinite}
+
+.side-profile{display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px;
+  padding:16px 8px;border:1px solid var(--border);border-radius:var(--radius);background:var(--panel)}
+.side-profile .pic{width:104px;height:104px;border-radius:18px;overflow:hidden;
+  border:1px solid var(--border-strong);box-shadow:0 8px 24px -10px var(--glow)}
+.side-profile .pic img{width:100%;height:100%;object-fit:cover;display:block}
+.side-profile .nm{color:var(--heading);font-weight:700;font-size:.98rem}
+.side-profile .rl{color:var(--muted);font-size:.74rem;font-family:var(--font-mono)}
+.side-profile .st{font-size:.66rem;color:var(--green);font-family:var(--font-mono);
+  display:inline-flex;align-items:center;gap:6px}
+.side-profile .st::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.6s infinite}
+
+.side-nav{display:flex;flex-direction:column;gap:3px}
+.side-nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;
+  font-family:var(--font-mono);font-size:.84rem;color:var(--muted);transition:.2s;position:relative}
+.side-nav a .ix{color:var(--faint);font-size:.72rem;width:22px}
+.side-nav a:hover{color:var(--heading);background:var(--panel)}
+.side-nav a.active{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.side-nav a.active::before{content:"";position:absolute;inset-inline-start:0;top:8px;bottom:8px;
+  width:3px;border-radius:3px;background:var(--accent)}
+.side-nav a.active .ix{color:var(--accent)}
+
+.side-cmdk{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;width:100%;
+  border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;
+  font-family:var(--font-mono);font-size:.78rem;transition:.2s}
+.side-cmdk:hover{border-color:var(--accent);color:var(--text)}
+.side-cmdk .kbd{margin-inline-start:auto}
+
+.side-tools{display:flex;gap:8px}
+.icon-btn{flex:1;height:38px;border-radius:9px;border:1px solid var(--border);
+  background:var(--panel);color:var(--text);cursor:pointer;display:grid;place-items:center;
+  transition:.2s;font-family:var(--font-mono);font-size:.8rem}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+.kbd{font-family:var(--font-mono);font-size:.66rem;border:1px solid var(--border);
+  border-radius:6px;padding:2px 6px;color:var(--muted);background:var(--bg-2)}
+
+.side-social{display:flex;gap:8px;justify-content:center;margin-top:auto;padding-top:6px}
+.side-social a{width:34px;height:34px;border:1px solid var(--border);border-radius:9px;
+  display:grid;place-items:center;color:var(--muted);transition:.2s}
+.side-social a:hover{color:var(--accent);border-color:var(--accent)}
+.side-social svg{width:16px;height:16px}
+.side-foot{font-family:var(--font-mono);font-size:.66rem;color:var(--faint);text-align:center}
+
+/* main content offset */
+.main{margin-inline-start:var(--sbw)}
+
+/* mobile top bar + drawer overlay (shown < 960px) */
+.mbar{display:none}
+.sb-overlay{display:none}
+
+/* ---------- hero ---------- */
+.hero{padding-top:104px;padding-bottom:60px}
+.hero-grid{display:grid;grid-template-columns:1.35fr .9fr;gap:48px;align-items:center}
+.term-tag{font-family:var(--font-mono);font-size:.78rem;color:var(--faint);margin-bottom:20px}
+.term-tag b{color:var(--accent)}
+.hero h1{font-size:clamp(2.4rem,6vw,4.1rem);line-height:1.02;letter-spacing:-.03em;
+  color:var(--heading);font-weight:800;margin-bottom:6px}
+.hero .hi{color:var(--muted);font-weight:500;font-size:clamp(1rem,2vw,1.2rem);
+  font-family:var(--font-mono);display:block;margin-bottom:10px}
+.rotator{display:inline-flex;align-items:center;font-family:var(--font-mono);
+  color:var(--accent);font-size:clamp(1.05rem,2.6vw,1.6rem);font-weight:600;
+  margin-top:18px;min-height:1.6em}
+.rotator .caret{display:inline-block;width:10px;height:1.1em;background:var(--accent);
+  margin-inline-start:4px;animation:blink 1s steps(1) infinite;translate:0 2px}
+@keyframes blink{50%{opacity:0}}
+.lead{color:var(--muted);font-size:1.06rem;margin:22px 0 30px;max-width:52ch}
+.cta{display:flex;gap:14px;flex-wrap:wrap}
+.btn{font-family:var(--font-mono);font-size:.85rem;font-weight:600;padding:13px 22px;
+  border-radius:11px;cursor:pointer;border:1px solid var(--border-strong);
+  background:var(--panel);color:var(--text);transition:.2s;display:inline-flex;
+  align-items:center;gap:9px}
+.btn:hover{transform:translateY(-2px);border-color:var(--accent)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#04121c;border-color:transparent;box-shadow:0 10px 30px -8px var(--glow)}
+.btn-primary:hover{box-shadow:0 14px 38px -8px var(--glow)}
+.socials{display:flex;gap:12px;margin-top:26px}
+.socials a{width:40px;height:40px;border:1px solid var(--border);border-radius:10px;
+  display:grid;place-items:center;color:var(--muted);transition:.2s}
+.socials a:hover{color:var(--accent);border-color:var(--accent);transform:translateY(-2px)}
+.socials svg{width:18px;height:18px}
+
+/* ---------- status console card ---------- */
+.console{border:1px solid var(--border);border-radius:var(--radius);
+  background:linear-gradient(180deg,var(--bg-3),var(--bg-2));
+  box-shadow:var(--shadow);overflow:hidden}
+.console-bar{display:flex;align-items:center;gap:8px;padding:11px 14px;
+  border-bottom:1px solid var(--border);background:var(--panel)}
+.console-bar .lights{display:flex;gap:6px}
+.console-bar .lights i{width:11px;height:11px;border-radius:50%;display:block}
+.l1{background:#ff5f57}.l2{background:#febc2e}.l3{background:#28c840}
+.console-bar .name{font-family:var(--font-mono);font-size:.74rem;color:var(--muted);
+  margin-inline-start:6px}
+.console-body{padding:18px 18px 20px;font-family:var(--font-mono);font-size:.82rem}
+.status-row{display:flex;justify-content:space-between;align-items:center;
+  padding:9px 0;border-bottom:1px dashed var(--border)}
+.status-row:last-child{border-bottom:0}
+.status-row .k{color:var(--faint)}
+.status-row .v{color:var(--text);display:flex;align-items:center;gap:8px}
+.ok{color:var(--green)}
+.badge-live{font-size:.62rem;letter-spacing:.1em;color:var(--green);
+  border:1px solid color-mix(in srgb,var(--green) 40%,transparent);
+  border-radius:20px;padding:2px 9px;display:inline-flex;align-items:center;gap:6px}
+.badge-live::before{content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--green);animation:pulse 1.6s infinite}
+.meter{height:6px;border-radius:20px;background:var(--panel);overflow:hidden;
+  width:120px;border:1px solid var(--border)}
+.meter i{display:block;height:100%;border-radius:20px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .8s ease}
+.spark{display:flex;align-items:flex-end;gap:2px;height:26px}
+.spark i{width:4px;background:var(--accent);border-radius:2px;opacity:.75;
+  transition:height .5s ease}
+
+/* ---------- avatar ---------- */
+.avatar{width:52px;height:52px;border-radius:12px;flex:none;overflow:hidden;
+  background:linear-gradient(135deg,var(--accent),var(--accent-3));
+  display:grid;place-items:center;font-family:var(--font-mono);font-weight:800;
+  color:#04121c;font-size:1.15rem;box-shadow:0 8px 24px -8px var(--glow)}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* ---------- about portrait (operator ID) ---------- */
+.portrait{width:210px;margin-bottom:26px}
+.portrait .frame{position:relative;display:block;border-radius:16px}
+.portrait .frame img{width:100%;border-radius:16px;display:block;
+  border:1px solid var(--border-strong);
+  filter:grayscale(.18) contrast(1.03);box-shadow:var(--shadow);transition:.45s ease}
+.portrait:hover .frame img{filter:none;transform:translateY(-2px)}
+.portrait .frame::before,.portrait .frame::after{content:"";position:absolute;
+  width:20px;height:20px;border:2px solid var(--accent)}
+.portrait .frame::before{top:-6px;inset-inline-start:-6px;border-right:0;border-bottom:0;border-radius:6px 0 0 0}
+.portrait .frame::after{bottom:-6px;inset-inline-end:-6px;border-left:0;border-top:0;border-radius:0 0 6px 0}
+.portrait figcaption{font-family:var(--font-mono);font-size:.72rem;color:var(--muted);
+  margin-top:12px;display:flex;align-items:center;gap:8px}
+.portrait figcaption .ok{font-size:.9rem}
+
+/* ---------- stats ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stat{border:1px solid var(--border);border-radius:var(--radius);padding:24px 20px;
+  background:var(--panel);position:relative;overflow:hidden}
+.stat::after{content:"";position:absolute;top:0;inset-inline-start:0;width:100%;height:2px;
+  background:linear-gradient(90deg,var(--accent),transparent);opacity:.7}
+.stat .num{font-family:var(--font-mono);font-size:2.3rem;font-weight:800;
+  color:var(--heading);line-height:1}
+.stat .num .suf{color:var(--accent)}
+.stat .lbl{color:var(--muted);font-size:.82rem;margin-top:8px}
+
+/* ---------- generic card grid ---------- */
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.card{border:1px solid var(--border);border-radius:var(--radius);padding:26px;
+  background:var(--panel);transition:.25s;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-4px);border-color:var(--border-strong);
+  box-shadow:var(--shadow)}
+.card .ico{width:46px;height:46px;border-radius:11px;display:grid;place-items:center;
+  background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);
+  margin-bottom:16px}
+.card .ico svg{width:24px;height:24px}
+.card h3{color:var(--heading);font-size:1.12rem;margin-bottom:8px}
+.card p{color:var(--muted);font-size:.92rem}
+.card .tag{font-family:var(--font-mono);font-size:.68rem;color:var(--accent);
+  position:absolute;top:18px;inset-inline-end:20px;opacity:.5}
+
+/* ---------- about ---------- */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:start}
+.about-grid p{color:var(--muted);margin-bottom:16px}
+.about-grid strong{color:var(--text);font-weight:600}
+.about-code{border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--panel-solid);font-family:var(--font-mono);font-size:.82rem;
+  overflow:hidden;box-shadow:var(--shadow)}
+.about-code .console-bar{background:var(--bg-2)}
+.about-code pre{padding:20px;overflow-x:auto;line-height:1.75;color:var(--text)}
+.tok-key{color:var(--accent-3)}.tok-str{color:var(--green)}
+.tok-fn{color:var(--accent)}.tok-com{color:var(--faint)}.tok-num{color:var(--amber)}
+
+/* ---------- skills (proficiency cards) ---------- */
+.skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.skill-group{border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px 22px;background:var(--panel)}
+.skill-group h4{font-family:var(--font-mono);font-size:.72rem;color:var(--muted);letter-spacing:.14em;
+  text-transform:uppercase;padding-bottom:13px;margin-bottom:15px;border-bottom:1px solid var(--border)}
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{font-family:var(--font-mono);font-size:.76rem;padding:6px 8px 6px 11px;border-radius:9px;
+  border:1px solid var(--border);background:var(--bg-2);color:var(--text);transition:.2s;
+  display:inline-flex;align-items:center;gap:8px}
+.chip:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow)}
+.lvl{font-size:.58rem;font-weight:700;padding:2px 6px;border-radius:5px;letter-spacing:.02em}
+.lvl.exp{background:color-mix(in srgb,var(--green) 20%,transparent);color:var(--green)}
+.lvl.adv{background:color-mix(in srgb,var(--accent-3) 24%,transparent);color:var(--accent-3)}
+.lvl.int{background:color-mix(in srgb,var(--accent) 20%,transparent);color:var(--accent)}
+
+/* ---------- experience timeline (accordion) ---------- */
+.timeline{position:relative;padding-inline-start:30px}
+.timeline::before{content:"";position:absolute;inset-inline-start:7px;top:6px;bottom:6px;
+  width:2px;background:linear-gradient(var(--accent),transparent)}
+.tl-item{position:relative;margin-bottom:12px}
+.tl-item:last-child{margin-bottom:0}
+.tl-item::before{content:"";position:absolute;inset-inline-start:-30px;top:19px;z-index:1;
+  width:15px;height:15px;border-radius:50%;background:var(--bg);
+  border:3px solid var(--accent);box-shadow:0 0 0 4px var(--glow)}
+.tl-item summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;
+  padding:14px 16px;border:1px solid var(--border);border-radius:12px;background:var(--panel);transition:.2s}
+.tl-item summary::-webkit-details-marker{display:none}
+.tl-item summary:hover{border-color:var(--accent)}
+.tl-item[open] summary{border-color:var(--accent);border-bottom-left-radius:0;border-bottom-right-radius:0}
+.tl-sum-main{display:flex;flex-direction:column;gap:3px;min-width:0}
+.tl-role{color:var(--heading);font-size:1.05rem;font-weight:700}
+.tl-co{color:var(--muted);font-size:.82rem;font-family:var(--font-mono)}
+.tl-when{margin-inline-start:auto;font-family:var(--font-mono);font-size:.68rem;color:var(--accent);
+  white-space:nowrap;border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);
+  padding:3px 9px;border-radius:20px}
+.tl-chev{color:var(--muted);transition:transform .25s ease;flex:none;font-size:.8rem}
+.tl-item[open] .tl-chev{transform:rotate(180deg);color:var(--accent)}
+.tl-body{border:1px solid var(--accent);border-top:0;border-radius:0 0 12px 12px;
+  padding:14px 16px 16px;background:color-mix(in srgb,var(--accent) 5%,transparent);
+  animation:tlopen .25s ease}
+@keyframes tlopen{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.tl-item ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.tl-item li{color:var(--muted);font-size:.92rem;padding-inline-start:20px;position:relative}
+.tl-item li::before{content:"▸";position:absolute;inset-inline-start:0;color:var(--accent)}
+
+/* ---------- certs / edu ---------- */
+.cert{display:flex;gap:16px;align-items:center;border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px;background:var(--panel);transition:.25s}
+.cert:hover{border-color:var(--border-strong);transform:translateY(-3px);box-shadow:var(--shadow)}
+.cert .seal{width:52px;height:52px;flex:none;border-radius:12px;display:grid;
+  place-items:center;font-family:var(--font-mono);font-weight:800;font-size:.72rem;
+  background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent);
+  border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);text-align:center}
+.cert h4{color:var(--heading);font-size:1rem;margin-bottom:2px}
+.cert p{color:var(--muted);font-size:.85rem;font-family:var(--font-mono)}
+.cert .verified{margin-inline-start:auto;color:var(--green);font-size:.7rem;
+  font-family:var(--font-mono);white-space:nowrap}
+.cbadge{flex:none;display:grid;place-items:center}
+.cbadge svg{width:54px;height:60px;display:block;filter:drop-shadow(0 6px 14px rgba(0,0,0,.35))}
+.cert:hover .cbadge svg{transform:translateY(-2px);transition:transform .25s ease}
+
+/* ---------- terminal section ---------- */
+.terminal{border:1px solid var(--border-strong);border-radius:var(--radius);
+  background:#05090f;box-shadow:var(--shadow);overflow:hidden;direction:ltr}
+[data-theme="light"] .terminal{background:#0b1119}
+.terminal .console-bar{background:#0a1018;border-bottom-color:rgba(255,255,255,.08)}
+.terminal .console-bar .name{color:#8895a7}
+.term-screen{padding:20px;font-family:var(--font-mono);font-size:.84rem;
+  height:380px;overflow-y:auto;color:#cfe3f2}
+.term-screen::-webkit-scrollbar{width:8px}
+.term-screen::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:8px}
+.term-line{white-space:pre-wrap;word-break:break-word;margin-bottom:2px}
+.term-prompt{color:var(--green)}
+.term-path{color:var(--accent)}
+.term-accent{color:var(--accent)}
+.term-muted{color:#5b6675}
+.term-warn{color:var(--amber)}
+.term-input-row{display:flex;align-items:center;gap:8px;padding:0 20px 18px;
+  font-family:var(--font-mono);font-size:.84rem;background:#05090f}
+[data-theme="light"] .term-input-row{background:#0b1119}
+.term-input-row .term-prompt{flex:none}
+#term-input{flex:1;background:transparent;border:0;outline:0;color:#cfe3f2;
+  font-family:var(--font-mono);font-size:.84rem;caret-color:var(--accent)}
+.term-hint{color:#5b6675;font-family:var(--font-mono);font-size:.74rem;margin-top:12px;
+  text-align:center}
+.term-hint code{color:var(--accent);background:var(--panel);padding:2px 7px;border-radius:6px}
+
+/* ---------- contact ---------- */
+.contact-wrap{border:1px solid var(--border);border-radius:20px;
+  background:linear-gradient(160deg,var(--bg-3),var(--bg-2));padding:52px;
+  text-align:center;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.contact-wrap::before{content:"";position:absolute;top:-40%;left:50%;translate:-50% 0;
+  width:600px;height:400px;background:radial-gradient(circle,var(--glow),transparent 70%);
+  pointer-events:none}
+.contact-wrap h2{font-size:clamp(1.8rem,4vw,2.6rem);color:var(--heading);
+  position:relative;letter-spacing:-.02em}
+.contact-wrap p{color:var(--muted);margin:14px auto 28px;max-width:46ch;position:relative}
+.contact-methods{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--border);padding:30px 0}
+.foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;
+  font-family:var(--font-mono);font-size:.78rem;color:var(--muted)}
+.foot .ok{display:inline-flex;align-items:center;gap:8px}
+
+/* ---------- command palette ---------- */
+.cmdk-overlay{position:fixed;inset:0;z-index:200;background:rgba(3,6,11,.6);
+  backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;
+  padding-top:14vh}
+.cmdk-overlay.open{display:flex}
+.cmdk{width:min(560px,92vw);background:var(--panel-solid);border:1px solid var(--border-strong);
+  border-radius:16px;box-shadow:0 30px 80px -20px rgba(0,0,0,.7);overflow:hidden}
+.cmdk input{width:100%;padding:18px 20px;background:transparent;border:0;outline:0;
+  color:var(--text);font-size:1rem;font-family:var(--font-mono);
+  border-bottom:1px solid var(--border)}
+.cmdk-list{max-height:340px;overflow-y:auto;padding:8px}
+.cmdk-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;
+  cursor:pointer;color:var(--muted);font-size:.9rem}
+.cmdk-item .ci{font-family:var(--font-mono);color:var(--accent);width:20px;text-align:center}
+.cmdk-item small{margin-inline-start:auto;font-family:var(--font-mono);font-size:.7rem;color:var(--faint)}
+.cmdk-item.active,.cmdk-item:hover{background:var(--panel);color:var(--heading)}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- back to top ---------- */
+.to-top{position:fixed;bottom:24px;inset-inline-end:24px;z-index:80;width:46px;height:46px;
+  border-radius:12px;border:1px solid var(--border-strong);background:var(--panel-solid);
+  color:var(--accent);cursor:pointer;display:grid;place-items:center;box-shadow:var(--shadow);
+  opacity:0;visibility:hidden;transform:translateY(12px);transition:.25s ease;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.to-top.show{opacity:1;visibility:visible;transform:none}
+.to-top:hover{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow),var(--shadow);transform:translateY(-2px)}
+.to-top svg{width:20px;height:20px}
+
+/* ---------- responsive ---------- */
+@media(max-width:960px){
+  .sidebar{transform:translateX(-100%);box-shadow:var(--shadow);width:280px;z-index:100}
+  [dir="rtl"] .sidebar{transform:translateX(100%)}
+  .sidebar.open{transform:none}
+  .main{margin-inline-start:0}
+  body{padding-top:58px}
+  .hero{padding-top:34px}
+  .mbar{display:flex;position:fixed;top:0;left:0;right:0;z-index:90;align-items:center;gap:12px;
+    padding:11px 18px;background:color-mix(in srgb,var(--bg) 86%,transparent);
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+  .mbar .icon-btn{width:40px;flex:none}
+  .mbar .menu-btn{margin-inline-start:auto}
+  .sb-overlay.open{display:block;position:fixed;inset:0;z-index:95;background:rgba(3,6,11,.55);backdrop-filter:blur(3px)}
+}
+@media(max-width:860px){
+  .hero-grid,.about-grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .cards,.skills-grid{grid-template-columns:1fr}
+  .contact-wrap{padding:36px 22px}
+}
+@media(max-width:480px){.stats{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bg-fx"></div>
+<div class="scan"></div>
+
+<!-- ============ MOBILE BAR (shown < 960px) ============ -->
+<div class="mbar">
+  <a href="#top" class="brand"><span class="dot"></span>sabz<span style="color:var(--accent)">@</span>azure</a>
+  <button class="icon-btn menu-btn" id="menuBtn" title="Menu" aria-label="Menu">≡</button>
+</div>
+<div class="sb-overlay" id="sbOverlay"></div>
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar" id="sidebar">
+  <a href="#top" class="brand"><span class="dot"></span>sabz<span style="color:var(--accent)">@</span>azure<span class="term-muted">:~$</span></a>
+
+  <div class="side-profile">
+    <div class="pic"><img src="headshot.jpg" alt="Sabz Ali" /></div>
+    <div>
+      <div class="nm">Sabz Ali</div>
+      <div class="rl">Azure Cloud Admin</div>
+    </div>
+    <span class="st" data-i18n="status.online">online</span>
+  </div>
+
+  <nav class="side-nav" id="sideNav">
+    <a href="#home" data-sec="home"><span class="ix">00</span><span data-i18n="nav.home">home</span></a>
+    <a href="#about" data-sec="about"><span class="ix">01</span><span data-i18n="nav.about">about</span></a>
+    <a href="#services" data-sec="services"><span class="ix">02</span><span data-i18n="nav.services">services</span></a>
+    <a href="#skills" data-sec="skills"><span class="ix">03</span><span data-i18n="nav.skills">skills</span></a>
+    <a href="#experience" data-sec="experience"><span class="ix">04</span><span data-i18n="nav.exp">experience</span></a>
+    <a href="#certs" data-sec="certs"><span class="ix">05</span><span data-i18n="nav.certs">certs</span></a>
+    <a href="#terminal" data-sec="terminal"><span class="ix">06</span><span data-i18n="nav.terminal">terminal</span></a>
+    <a href="#contact" data-sec="contact"><span class="ix">07</span><span data-i18n="nav.contact">contact</span></a>
+  </nav>
+
+  <button class="side-cmdk" id="openCmdk" title="Command palette">
+    <span style="color:var(--accent)">⌕</span><span data-i18n="nav.search">search</span>
+    <span class="kbd">Ctrl K</span>
+  </button>
+
+  <div class="side-tools">
+    <button class="icon-btn" id="langBtn" title="Language">EN</button>
+    <button class="icon-btn" id="themeBtn" title="Theme">☾</button>
+  </div>
+
+  <div class="side-social">
+    <a href="mailto:sabzalikhan333@gmail.com" title="Email" style="color:#EA4335">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></a>
+    <a href="https://www.linkedin.com/in/sabzalikhan/" target="_blank" rel="noopener" title="LinkedIn" style="color:#0A66C2">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 11-.02 5 2.5 2.5 0 01.02-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V21H20v-5.4c0-1.3 0-2.96-1.8-2.96-1.8 0-2.08 1.4-2.08 2.86V21H9z"/></svg></a>
+    <a href="tel:+923478203915" title="Phone" style="color:#22C55E">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3 19.5 19.5 0 01-6-6 19.8 19.8 0 01-3-8.6A2 2 0 014.1 2h3a2 2 0 012 1.7c.1.9.3 1.8.6 2.6a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.5-1.1a2 2 0 012.1-.5c.8.3 1.7.5 2.6.6a2 2 0 011.7 2z"/></svg></a>
+  </div>
+  <div class="side-foot">© <span id="yearSb"></span> · Karachi, PK</div>
+</aside>
+
+<main class="main">
+<span id="top"></span>
+
+<!-- ============ HERO ============ -->
+<section class="hero wrap" id="home">
+  <div class="hero-grid">
+    <div>
+      <p class="term-tag reveal">operator/01 — <b>ready</b> · <span data-i18n="hero.loc">Karachi, PK · PKT (GMT+5)</span></p>
+      <span class="hi reveal" data-i18n="hero.hi">// hi, my name is</span>
+      <h1 class="reveal">Sabz Ali</h1>
+      <div class="rotator reveal"><span id="rotator"></span><span class="caret"></span></div>
+      <p class="lead reveal" data-i18n="hero.lead">I design, secure, and automate cloud infrastructure — from Infrastructure as Code and CI/CD pipelines to observability, governance, and backup/BCDR.</p>
+      <div class="cta reveal">
+        <a class="btn btn-primary" href="Sabz-Ali-Resume.pdf" download>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+          <span data-i18n="hero.cv">Download CV</span>
+        </a>
+        <a class="btn" href="#contact"><span data-i18n="hero.contact">Get in touch</span> →</a>
+      </div>
+      <div class="socials reveal">
+        <a href="mailto:sabzalikhan333@gmail.com" title="Email" style="color:#EA4335">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></a>
+        <a href="https://www.linkedin.com/in/sabzalikhan/" target="_blank" rel="noopener" title="LinkedIn" style="color:#0A66C2">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 11-.02 5 2.5 2.5 0 01.02-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V21H20v-5.4c0-1.3 0-2.96-1.8-2.96-1.8 0-2.08 1.4-2.08 2.86V21H9z"/></svg></a>
+        <a href="tel:+923478203915" title="Phone" style="color:#22C55E">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3 19.5 19.5 0 01-6-6 19.8 19.8 0 01-3-8.6A2 2 0 014.1 2h3a2 2 0 012 1.7c.1.9.3 1.8.6 2.6a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.5-1.1a2 2 0 012.1-.5c.8.3 1.7.5 2.6.6a2 2 0 011.7 2z"/></svg></a>
+      </div>
+    </div>
+
+    <!-- live status console -->
+    <div class="console reveal">
+      <div class="console-bar">
+        <div class="lights"><i class="l1"></i><i class="l2"></i><i class="l3"></i></div>
+        <span class="name">system-status — live</span>
+        <span class="badge-live" style="margin-inline-start:auto" data-i18n="status.live">LIVE</span>
+      </div>
+      <div class="console-body">
+        <div style="display:flex;gap:13px;align-items:center;margin-bottom:14px">
+          <div class="avatar"><img src="headshot.jpg" alt="Sabz Ali" /></div>
+          <div>
+            <div style="color:var(--heading);font-weight:700">Sabz Ali</div>
+            <div class="term-muted" style="font-size:.76rem">Azure Cloud Administrator</div>
+          </div>
+        </div>
+        <div class="status-row"><span class="k" data-i18n="status.avail">availability</span>
+          <span class="v ok">● <span data-i18n="status.open">open to work</span></span></div>
+        <div class="status-row"><span class="k">response time</span><span class="v">&lt; 24h</span></div>
+        <div class="status-row"><span class="k">uptime</span><span class="v ok" id="m-uptime">99.98%</span></div>
+        <div class="status-row"><span class="k">latency</span><span class="v" id="m-latency">— ms</span></div>
+        <div class="status-row"><span class="k">cpu</span>
+          <span class="v"><span class="meter"><i id="m-cpu" style="width:32%"></i></span></span></div>
+        <div class="status-row"><span class="k">throughput</span>
+          <span class="v"><span class="spark" id="spark"></span></span></div>
+        <div class="status-row"><span class="k">all systems</span>
+          <span class="v ok" data-i18n="status.ok">operational</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="wrap" style="padding-top:20px">
+  <div class="stats">
+    <div class="stat reveal"><div class="num" data-count="4">0<span class="suf">+</span></div><div class="lbl" data-i18n="stat.years">Years in IT & Cloud</div></div>
+    <div class="stat reveal"><div class="num" data-count="4">0</div><div class="lbl" data-i18n="stat.certs">Microsoft Certifications</div></div>
+    <div class="stat reveal"><div class="num" data-count="25">0<span class="suf">+</span></div><div class="lbl" data-i18n="stat.tech">Technologies & Tools</div></div>
+    <div class="stat reveal"><div class="num" data-count="3">0</div><div class="lbl" data-i18n="stat.roles">Roles Across 2 Companies</div></div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section id="about" class="wrap">
+  <span class="eyebrow reveal">about/me</span>
+  <h2 class="title reveal" data-i18n="about.title">Operator behind the console</h2>
+  <div class="about-grid">
+    <div class="reveal">
+      <p>I'm a <strong>cloud administrator and DevOps engineer</strong> who likes turning complex infrastructure into something reliable, secure, and refreshingly boring to operate. Over the past few years I've worked across the full lifecycle — provisioning and automating environments, tightening security and governance, and keeping systems observable and resilient.</p>
+      <p>My day-to-day blends <strong>Infrastructure as Code</strong>, <strong>CI/CD automation</strong>, and hands-on operations. What I care about most is building platforms teams can trust — ones that scale cleanly and stay out of the way. I'm just as happy debugging a Linux box as I am writing a Terraform module or hardening an environment against threats.</p>
+      <p>Always learning, always automating — and glad to take on the problems nobody else wants to touch.</p>
+    </div>
+    <div class="about-code reveal">
+      <div class="console-bar"><div class="lights"><i class="l1"></i><i class="l2"></i><i class="l3"></i></div><span class="name">operator.tf</span></div>
+<pre><span class="tok-key">resource</span> <span class="tok-str">"azurerm_operator"</span> <span class="tok-str">"sabz"</span> {
+  <span class="tok-key">name</span>        = <span class="tok-str">"Sabz Ali"</span>
+  <span class="tok-key">role</span>        = <span class="tok-str">"Azure Cloud Administrator"</span>
+  <span class="tok-key">location</span>    = <span class="tok-str">"Karachi, PK"</span>
+  <span class="tok-key">focus</span>       = [<span class="tok-str">"cloud"</span>, <span class="tok-str">"devops"</span>, <span class="tok-str">"security"</span>]
+
+  <span class="tok-fn">tags</span> = {
+    certified = [<span class="tok-str">"AZ-900"</span>, <span class="tok-str">"AZ-104"</span>, <span class="tok-str">"AZ-305"</span>, <span class="tok-str">"AI-900"</span>]
+    status    = <span class="tok-str">"available"</span>
+    sla       = <span class="tok-str">"&lt; 24h response"</span>
+  }
+  <span class="tok-com"># apply infra that stays out of the way</span>
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section id="services" class="wrap">
+  <span class="eyebrow reveal">what/i-do</span>
+  <h2 class="title reveal" data-i18n="svc.title">What I bring to the platform</h2>
+  <div class="cards">
+    <div class="card reveal"><span class="tag">01</span>
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19a4.5 4.5 0 001-8.9A6 6 0 006 9.5 4.5 4.5 0 007 19z"/></svg></div>
+      <h3 data-i18n="svc.cloud.t">Cloud Engineering</h3>
+      <p data-i18n="svc.cloud.d">Design & deploy scalable, multi-environment Azure solutions with ARM and Infrastructure as Code — optimized for performance and cost.</p></div>
+    <div class="card reveal"><span class="tag">02</span>
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4m10-10h-4M6 12H2m15.07-5.07-2.83 2.83M9.76 14.24l-2.83 2.83m0-10.14 2.83 2.83m4.48 4.48 2.83 2.83"/></svg></div>
+      <h3 data-i18n="svc.devops.t">DevOps & Automation</h3>
+      <p data-i18n="svc.devops.d">CI/CD with GitHub Actions & Jenkins, config management with Ansible, and repeatable infra via Terraform — consistency over toil.</p></div>
+    <div class="card reveal"><span class="tag">03</span>
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <h3 data-i18n="svc.sec.t">Cloud Security</h3>
+      <p data-i18n="svc.sec.d">Harden environments with Microsoft Sentinel, Defender for Cloud, CrowdStrike & Rapid7, plus RBAC, NSGs, and audit logging.</p></div>
+    <div class="card reveal"><span class="tag">04</span>
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg></div>
+      <h3 data-i18n="svc.infra.t">Infrastructure & Support</h3>
+      <p data-i18n="svc.infra.d">Virtualization (VMware ESXi, Hyper-V), backup/BCDR (Veeam, Cove), M365 & Entra ID, and rock-solid Linux/Windows administration.</p></div>
+  </div>
+</section>
+
+<!-- ============ SKILLS ============ -->
+<section id="skills" class="wrap">
+  <span class="eyebrow reveal">stack/technologies</span>
+  <h2 class="title reveal" data-i18n="skills.title">Tools of the trade</h2>
+  <p class="section-sub reveal" data-i18n="skills.sub">The platforms, languages, and tooling I reach for day to day.</p>
+  <div class="reveal" style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:26px;font-family:var(--font-mono);font-size:.72rem;color:var(--muted)">
+    <span><span class="lvl exp">Exp</span> Expert</span>
+    <span><span class="lvl adv">Adv</span> Advanced</span>
+    <span><span class="lvl int">Int</span> Intermediate</span>
+  </div>
+  <div class="skills-grid reveal">
+    <div class="skill-group">
+      <h4 data-i18n="skills.cloud">CLOUD & PLATFORMS</h4>
+      <div class="chips">
+        <span class="chip">Microsoft Azure <span class="lvl exp">Exp</span></span>
+        <span class="chip">Azure Resource Manager <span class="lvl adv">Adv</span></span>
+        <span class="chip">Entra ID / Azure AD <span class="lvl adv">Adv</span></span>
+        <span class="chip">Azure Monitor <span class="lvl adv">Adv</span></span>
+        <span class="chip">Microsoft 365 <span class="lvl adv">Adv</span></span>
+        <span class="chip">Cost Management <span class="lvl int">Int</span></span>
+        <span class="chip">AWS <span class="lvl int">Int</span></span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <h4 data-i18n="skills.iac">IaC, CI/CD & CONTAINERS</h4>
+      <div class="chips">
+        <span class="chip">Terraform <span class="lvl adv">Adv</span></span>
+        <span class="chip">Ansible <span class="lvl adv">Adv</span></span>
+        <span class="chip">ARM Templates <span class="lvl adv">Adv</span></span>
+        <span class="chip">GitHub Actions <span class="lvl adv">Adv</span></span>
+        <span class="chip">Jenkins <span class="lvl int">Int</span></span>
+        <span class="chip">Docker <span class="lvl int">Int</span></span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <h4 data-i18n="skills.sec">SECURITY & GOVERNANCE</h4>
+      <div class="chips">
+        <span class="chip">Microsoft Sentinel <span class="lvl adv">Adv</span></span>
+        <span class="chip">Defender for Cloud <span class="lvl adv">Adv</span></span>
+        <span class="chip">RBAC <span class="lvl adv">Adv</span></span>
+        <span class="chip">NSG <span class="lvl adv">Adv</span></span>
+        <span class="chip">CrowdStrike <span class="lvl int">Int</span></span>
+        <span class="chip">Rapid7 <span class="lvl int">Int</span></span>
+        <span class="chip">Audit Logging <span class="lvl int">Int</span></span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <h4 data-i18n="skills.sys">SYSTEMS & VIRTUALIZATION</h4>
+      <div class="chips">
+        <span class="chip">Linux (Ubuntu/CentOS) <span class="lvl adv">Adv</span></span>
+        <span class="chip">Windows Server <span class="lvl adv">Adv</span></span>
+        <span class="chip">Active Directory <span class="lvl adv">Adv</span></span>
+        <span class="chip">VMware ESXi <span class="lvl int">Int</span></span>
+        <span class="chip">Hyper-V <span class="lvl int">Int</span></span>
+        <span class="chip">Dell PowerEdge (iDRAC) <span class="lvl int">Int</span></span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <h4 data-i18n="skills.ops">BACKUP, BCDR & MONITORING</h4>
+      <div class="chips">
+        <span class="chip">Veeam <span class="lvl adv">Adv</span></span>
+        <span class="chip">Cove <span class="lvl int">Int</span></span>
+        <span class="chip">SolarWinds RMM <span class="lvl int">Int</span></span>
+        <span class="chip">Datto <span class="lvl int">Int</span></span>
+        <span class="chip">Synology NAS <span class="lvl int">Int</span></span>
+        <span class="chip">Cisco Meraki <span class="lvl int">Int</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXPERIENCE ============ -->
+<section id="experience" class="wrap">
+  <span class="eyebrow reveal">career/log</span>
+  <h2 class="title reveal" data-i18n="exp.title">Professional experience</h2>
+  <div class="timeline reveal">
+    <details class="tl-item">
+      <summary>
+        <span class="tl-sum-main">
+          <span class="tl-role">Azure Cloud Administrator</span>
+          <span class="tl-co">Contour Software · Karachi, PK — Hybrid</span>
+        </span>
+        <span class="tl-when">AUG 2023 — PRESENT</span>
+        <span class="tl-chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="tl-body">
+        <ul>
+          <li>Designed, deployed, and managed scalable Azure solutions using ARM & Infrastructure as Code.</li>
+          <li>Hardened security with Microsoft Sentinel, Defender for Cloud, RBAC, and NSGs; tuned reliability & cost via Azure Monitor.</li>
+          <li>Automated delivery with Ansible, Jenkins, and GitHub Actions across multi-environment setups.</li>
+        </ul>
+      </div>
+    </details>
+    <details class="tl-item">
+      <summary>
+        <span class="tl-sum-main">
+          <span class="tl-role">Trainee DevOps Engineer</span>
+          <span class="tl-co">Contour Software · Karachi, PK — Hybrid</span>
+        </span>
+        <span class="tl-when">AUG 2023 — NOV 2023</span>
+        <span class="tl-chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="tl-body">
+        <ul>
+          <li>Built a solid Linux foundation across Ubuntu & CentOS, plus Active Directory and IT operations.</li>
+          <li>Explored automation with Docker, Terraform, and Ansible — containers, provisioning, and config management.</li>
+        </ul>
+      </div>
+    </details>
+    <details class="tl-item">
+      <summary>
+        <span class="tl-sum-main">
+          <span class="tl-role">Technical Support Executive</span>
+          <span class="tl-co">Eplanet Global · On-Site</span>
+        </span>
+        <span class="tl-when">JAN 2022 — 2023</span>
+        <span class="tl-chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="tl-body">
+        <ul>
+          <li>Resolved issues across Windows Server, Linux, AWS, and Azure; administered users via Azure AD & M365.</li>
+          <li>Supported VMware, Hyper-V, and Dell PowerEdge; ran backup/restore with Veeam & Cove.</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CERTS + EDU ============ -->
+<section id="certs" class="wrap">
+  <span class="eyebrow reveal">credentials/verified</span>
+  <h2 class="title reveal" data-i18n="cert.title">Certifications & education</h2>
+  <div class="cards" style="margin-bottom:18px">
+    <div class="cert reveal">
+      <div class="cbadge">
+        <svg viewBox="0 0 64 72" role="img" aria-label="AZ-900 badge">
+          <polygon points="32,1 61,17 61,55 32,71 3,55 3,17" fill="#117D95"/>
+          <polygon points="32,1 61,17 61,55 32,71 3,55 3,17" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.4"/>
+          <g transform="translate(23.5,12)"><rect width="7.5" height="7.5" fill="#F25022"/><rect x="9.5" width="7.5" height="7.5" fill="#7FBA00"/><rect y="9.5" width="7.5" height="7.5" fill="#00A4EF"/><rect x="9.5" y="9.5" width="7.5" height="7.5" fill="#FFB900"/></g>
+          <text x="32" y="45" text-anchor="middle" fill="#fff" font-family="monospace" font-size="11" font-weight="700">AZ-900</text>
+          <text x="32" y="58" text-anchor="middle" fill="rgba(255,255,255,.85)" font-family="monospace" font-size="5.3" letter-spacing=".5">FUNDAMENTALS</text>
+        </svg>
+      </div>
+      <div><h4>Azure Fundamentals</h4><p>Microsoft Certified · AZ-900</p></div>
+      <span class="verified">✓ verified</span>
+    </div>
+    <div class="cert reveal">
+      <div class="cbadge">
+        <svg viewBox="0 0 64 72" role="img" aria-label="AZ-104 badge">
+          <polygon points="32,1 61,17 61,55 32,71 3,55 3,17" fill="#0F6CBD"/>
+          <polygon points="32,1 61,17 61,55 32,71 3,55 3,17" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.4"/>
+          <g transform="translate(23.5,12)"><rect width="7.5" height="7.5" fill="#F25022"/><rect x="9.5" width="7.5" height="7.5" fill="#7FBA00"/><rect y="9.5" width="7.5" height="7.5" fill="#00A4EF"/><rect x="9.5" y="9.5" width="7.5" height="7.5" fill="#FFB900"/></g>
+          <text x="32" y="45" text-anchor="middle" fill="#fff" font-family="monospace" font-size="11" font-weight="700">AZ-104</text>
+          <text x="32" y="58" text-anchor="middle" fill="rgba(255,255,255,.85)" font-family="monospace" font-size="5.6" letter-spacing=".5">ASSOCIATE</text>
+        </svg>
+      </div>
+      <div><h4>Azure Administrator Associate</h4><p>Microsoft Certified · AZ-104</p></div>
+      <span class="verified">✓ verified</span>
+    </div>
+    <div class="cert reveal">
+      <div class="cbadge">
+        <svg viewBox="0 0 64 72" role="img" aria-label="AZ-305 badge">
+          <polygon points="32,1 61,17 61,55 32,71 3,55 3,17" fill="#202B45"/>
+          <polygon points="32,1 61,17 61,55 32,71 3,55 3,17" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.4"/>
+          <g transform="translate(23.5,12)"><rect width="7.5" height="7.5" fill="#F25022"/><rect x="9.5" width="7.5" height="7.5" fill="#7FBA00"/><rect y="9.5" width="7.5" height="7.5" fill="#00A4EF"/><rect x="9.5" y="9.5" width="7.5" height="7.5" fill="#FFB900"/></g>
+          <text x="32" y="45" text-anchor="middle" fill="#fff" font-family="monospace" font-size="11" font-weight="700">AZ-305</text>
+          <text x="32" y="58" text-anchor="middle" fill="#FFB900" font-family="monospace" font-size="6" letter-spacing=".5">EXPERT</text>
+        </svg>
+      </div>
+      <div><h4>Azure Solutions Architect Expert</h4><p>Microsoft Certified · AZ-305</p></div>
+      <span class="verified">✓ verified</span>
+    </div>
+    <div class="cert reveal">
+      <div class="cbadge">
+        <svg viewBox="0 0 64 72" role="img" aria-label="AI-900 badge">
+          <polygon points="32,1 61,17 61,55 32,71 3,55 3,17" fill="#117D95"/>
+          <polygon points="32,1 61,17 61,55 32,71 3,55 3,17" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.4"/>
+          <g transform="translate(23.5,12)"><rect width="7.5" height="7.5" fill="#F25022"/><rect x="9.5" width="7.5" height="7.5" fill="#7FBA00"/><rect y="9.5" width="7.5" height="7.5" fill="#00A4EF"/><rect x="9.5" y="9.5" width="7.5" height="7.5" fill="#FFB900"/></g>
+          <text x="32" y="45" text-anchor="middle" fill="#fff" font-family="monospace" font-size="11" font-weight="700">AI-900</text>
+          <text x="32" y="58" text-anchor="middle" fill="rgba(255,255,255,.85)" font-family="monospace" font-size="5.3" letter-spacing=".5">FUNDAMENTALS</text>
+        </svg>
+      </div>
+      <div><h4>Azure AI Fundamentals</h4><p>Microsoft Certified · AI-900</p></div>
+      <span class="verified">✓ verified</span>
+    </div>
+  </div>
+  <div class="cert reveal">
+    <div class="seal" style="font-size:1.3rem">🎓</div>
+    <div><h4>B.S. Computer Science</h4><p>Iqra University, Karachi · CGPA 3.01/4.0 · 2017–2021</p></div>
+    <span class="verified">2021</span>
+  </div>
+</section>
+
+<!-- ============ TERMINAL ============ -->
+<section id="terminal" class="wrap">
+  <span class="eyebrow reveal">interactive/shell</span>
+  <h2 class="title reveal" data-i18n="term.title">Explore via terminal</h2>
+  <p class="section-sub reveal" data-i18n="term.sub">Prefer a keyboard? Type a command below. Start with <b>help</b>.</p>
+  <div class="terminal reveal">
+    <div class="console-bar">
+      <div class="lights"><i class="l1"></i><i class="l2"></i><i class="l3"></i></div>
+      <span class="name">sabz@azure: ~ — bash</span>
+    </div>
+    <div class="term-screen" id="termScreen"></div>
+    <div class="term-input-row">
+      <span class="term-prompt">sabz@azure</span><span style="color:#cfe3f2">:</span><span class="term-path">~</span><span style="color:#cfe3f2">$</span>
+      <input id="term-input" autocomplete="off" spellcheck="false" aria-label="terminal input" />
+    </div>
+  </div>
+  <p class="term-hint reveal">try: <code>help</code> <code>about</code> <code>skills</code> <code>experience</code> <code>certs</code> <code>neofetch</code> <code>contact</code> <code>clear</code></p>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact" class="wrap">
+  <div class="contact-wrap reveal">
+    <span class="eyebrow" style="justify-content:center" data-i18n="contact.eyebrow">let's connect</span>
+    <h2 data-i18n="contact.title">Have a project or a role in mind?</h2>
+    <p data-i18n="contact.sub">I'm open to Azure cloud, DevOps, and platform engineering opportunities. Response time under 24 hours — let's talk.</p>
+    <div class="contact-methods">
+      <a class="btn btn-primary" href="mailto:sabzalikhan333@gmail.com">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        sabzalikhan333@gmail.com</a>
+      <a class="btn" href="tel:+923478203915">+92 347 8203915</a>
+      <a class="btn" href="https://www.linkedin.com/in/sabzalikhan/" target="_blank" rel="noopener">LinkedIn →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="wrap">
+  <div class="foot">
+    <span>© <span id="year"></span> Sabz Ali · built with Azure in mind</span>
+    <span class="ok"><span class="dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green)"></span> <span data-i18n="foot.status">all systems operational</span></span>
+  </div>
+</footer>
+</main>
+
+<!-- ============ BACK TO TOP ============ -->
+<button class="to-top" id="toTop" title="Back to top" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<!-- ============ COMMAND PALETTE ============ -->
+<div class="cmdk-overlay" id="cmdkOverlay">
+  <div class="cmdk" role="dialog" aria-label="Command palette">
+    <input id="cmdkInput" placeholder="Jump to section or run a command…" />
+    <div class="cmdk-list" id="cmdkList"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   1. THEME
+   ============================================================ */
+const root=document.documentElement, themeBtn=document.getElementById('themeBtn');
+const savedTheme=localStorage.getItem('theme-v2');
+if(savedTheme) root.setAttribute('data-theme',savedTheme);
+function syncThemeIcon(){themeBtn.textContent=root.getAttribute('data-theme')==='dark'?'☾':'☀';}
+syncThemeIcon();
+themeBtn.onclick=()=>{const t=root.getAttribute('data-theme')==='dark'?'light':'dark';
+  root.setAttribute('data-theme',t);localStorage.setItem('theme-v2',t);syncThemeIcon();};
+
+/* ============================================================
+   2. i18n  (English / Urdu — UI chrome; technical body stays EN)
+   ============================================================ */
+const I18N={
+  en:{ 'nav.home':'home','nav.about':'about','nav.services':'services','nav.skills':'skills','nav.exp':'experience',
+    'nav.certs':'certs','nav.terminal':'terminal','nav.contact':'contact','nav.search':'search',
+    'hero.hi':'// hi, my name is','hero.loc':'Karachi, PK · PKT (GMT+5)',
+    'hero.lead':'I design, secure, and automate cloud infrastructure — from Infrastructure as Code and CI/CD pipelines to observability, governance, and backup/BCDR.',
+    'hero.cv':'Download CV','hero.contact':'Get in touch',
+    'status.live':'LIVE','status.avail':'availability','status.open':'open to work','status.online':'online','status.ok':'operational',
+    'stat.years':'Years in IT & Cloud','stat.certs':'Microsoft Certifications','stat.tech':'Technologies & Tools','stat.roles':'Roles Across 2 Companies',
+    'about.title':'Operator behind the console',
+    'svc.title':'What I bring to the platform',
+    'svc.cloud.t':'Cloud Engineering','svc.cloud.d':'Design & deploy scalable, multi-environment Azure solutions with ARM and Infrastructure as Code — optimized for performance and cost.',
+    'svc.devops.t':'DevOps & Automation','svc.devops.d':'CI/CD with GitHub Actions & Jenkins, config management with Ansible, and repeatable infra via Terraform — consistency over toil.',
+    'svc.sec.t':'Cloud Security','svc.sec.d':'Harden environments with Microsoft Sentinel, Defender for Cloud, CrowdStrike & Rapid7, plus RBAC, NSGs, and audit logging.',
+    'svc.infra.t':'Infrastructure & Support','svc.infra.d':'Virtualization (VMware ESXi, Hyper-V), backup/BCDR (Veeam, Cove), M365 & Entra ID, and rock-solid Linux/Windows administration.',
+    'skills.title':'Tools of the trade','skills.sub':'The platforms, languages, and tooling I reach for day to day.',
+    'skills.cloud':'CLOUD & PLATFORMS','skills.iac':'IaC, CI/CD & CONTAINERS','skills.sec':'SECURITY & GOVERNANCE','skills.sys':'SYSTEMS & VIRTUALIZATION','skills.ops':'BACKUP, BCDR & MONITORING',
+    'exp.title':'Professional experience','cert.title':'Certifications & education',
+    'term.title':'Explore via terminal','term.sub':'Prefer a keyboard? Type a command below. Start with help.',
+    'contact.eyebrow':'let\'s connect','contact.title':'Have a project or a role in mind?',
+    'contact.sub':'I\'m open to Azure cloud, DevOps, and platform engineering opportunities. Response time under 24 hours — let\'s talk.',
+    'foot.status':'all systems operational' },
+  ur:{ 'nav.home':'ہوم','nav.about':'تعارف','nav.services':'خدمات','nav.skills':'مہارتیں','nav.exp':'تجربہ',
+    'nav.certs':'اسناد','nav.terminal':'ٹرمینل','nav.contact':'رابطہ','nav.search':'تلاش',
+    'hero.hi':'// سلام، میرا نام ہے','hero.loc':'کراچی، پاکستان · (GMT+5)',
+    'hero.lead':'میں کلاؤڈ انفراسٹرکچر ڈیزائن، محفوظ اور خودکار کرتا ہوں — انفراسٹرکچر ایز کوڈ اور CI/CD سے لے کر مانیٹرنگ، گورننس اور بیک اپ تک۔',
+    'hero.cv':'سی وی ڈاؤن لوڈ کریں','hero.contact':'رابطہ کریں',
+    'status.live':'لائیو','status.avail':'دستیابی','status.open':'کام کے لیے دستیاب','status.online':'آن لائن','status.ok':'فعال',
+    'stat.years':'سال کا تجربہ','stat.certs':'مائیکروسافٹ اسناد','stat.tech':'ٹیکنالوجیز اور ٹولز','stat.roles':'دو کمپنیوں میں کردار',
+    'about.title':'کنسول کے پیچھے آپریٹر',
+    'svc.title':'میں پلیٹ فارم کو کیا دیتا ہوں',
+    'svc.cloud.t':'کلاؤڈ انجینئرنگ','svc.cloud.d':'ARM اور انفراسٹرکچر ایز کوڈ کے ساتھ قابلِ توسیع ایژور حل ڈیزائن اور تعینات کریں۔',
+    'svc.devops.t':'ڈیوآپس اور آٹومیشن','svc.devops.d':'GitHub Actions، Jenkins، Ansible اور Terraform کے ساتھ مستقل مزاج ڈیلیوری۔',
+    'svc.sec.t':'کلاؤڈ سیکیورٹی','svc.sec.d':'Sentinel، Defender، CrowdStrike، Rapid7 کے ساتھ ماحول کو محفوظ بنائیں، نیز RBAC اور NSG۔',
+    'svc.infra.t':'انفراسٹرکچر اور سپورٹ','svc.infra.d':'ورچوئلائزیشن، بیک اپ/BCDR، M365 اور Entra ID، اور مضبوط لینکس/ونڈوز ایڈمنسٹریشن۔',
+    'skills.title':'کام کے اوزار','skills.sub':'جو پلیٹ فارمز اور ٹولز میں روزانہ استعمال کرتا ہوں۔',
+    'skills.cloud':'کلاؤڈ اور پلیٹ فارمز','skills.iac':'IaC، CI/CD اور کنٹینرز','skills.sec':'سیکیورٹی اور گورننس','skills.sys':'سسٹمز اور ورچوئلائزیشن','skills.ops':'بیک اپ، BCDR اور مانیٹرنگ',
+    'exp.title':'پیشہ ورانہ تجربہ','cert.title':'اسناد اور تعلیم',
+    'term.title':'ٹرمینل کے ذریعے دریافت کریں','term.sub':'کی بورڈ پسند ہے؟ نیچے کمانڈ ٹائپ کریں۔ help سے شروع کریں۔',
+    'contact.eyebrow':'آئیے جڑیں','contact.title':'کوئی پروجیکٹ یا کردار ذہن میں ہے؟',
+    'contact.sub':'میں ایژور کلاؤڈ، ڈیوآپس اور پلیٹ فارم انجینئرنگ کے مواقع کے لیے دستیاب ہوں۔ 24 گھنٹے میں جواب۔',
+    'foot.status':'تمام سسٹمز فعال ہیں' }
+};
+let lang=localStorage.getItem('lang')||'en';
+const langBtn=document.getElementById('langBtn');
+function applyLang(){
+  const dict=I18N[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n'); if(dict[k]!=null) el.textContent=dict[k];
+  });
+  root.lang=lang; root.dir = lang==='ur'?'rtl':'ltr';
+  langBtn.textContent = lang==='en'?'EN':'UR';
+  localStorage.setItem('lang',lang);
+}
+langBtn.onclick=()=>{lang=lang==='en'?'ur':'en';applyLang();};
+applyLang();
+
+/* ============================================================
+   3. SIDEBAR — mobile drawer + scrollspy
+   ============================================================ */
+const sidebar=document.getElementById('sidebar');
+const sbOverlay=document.getElementById('sbOverlay');
+const menuBtn=document.getElementById('menuBtn');
+function toggleSb(open){sidebar.classList.toggle('open',open);sbOverlay.classList.toggle('open',open);}
+menuBtn.onclick=()=>toggleSb(!sidebar.classList.contains('open'));
+sbOverlay.onclick=()=>toggleSb(false);
+const sideLinks=[...document.querySelectorAll('#sideNav a')];
+// custom rAF smooth-scroll — works even when the OS has "reduce motion" on
+function smoothTo(targetY,dur){
+  targetY=Math.max(0,targetY);
+  const startY=window.scrollY, dist=targetY-startY;
+  if(Math.abs(dist)<4){window.scrollTo(0,targetY);return;}
+  const d=dur||Math.min(950,Math.max(380,Math.abs(dist)*0.5)), t0=performance.now();
+  const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2; // easeInOutQuad
+  requestAnimationFrame(function step(now){
+    const p=Math.min(1,(now-t0)/d);
+    window.scrollTo(0,startY+dist*ease(p));
+    if(p<1)requestAnimationFrame(step);
+  });
+}
+sideLinks.forEach(a=>a.addEventListener('click',e=>{
+  const el=document.getElementById(a.getAttribute('href').slice(1));
+  if(el){e.preventDefault();
+    const off=window.matchMedia('(max-width:960px)').matches?68:16;
+    smoothTo(el.getBoundingClientRect().top+window.scrollY-off);
+  }
+  toggleSb(false);
+}));
+// any other in-page anchor (Get in touch, brand logo, etc.)
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  if(a.closest('#sideNav'))return; // side-nav handled above
+  a.addEventListener('click',e=>{
+    const id=a.getAttribute('href').slice(1); if(!id)return;
+    const el=document.getElementById(id);
+    if(el){e.preventDefault();
+      const off=window.matchMedia('(max-width:960px)').matches?68:16;
+      smoothTo(el.getBoundingClientRect().top+window.scrollY-off);
+      toggleSb(false);
+    }
+  });
+});
+// scrollspy: highlight the section crossing the viewport middle band
+const spy=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){
+  const id=e.target.id;
+  sideLinks.forEach(a=>a.classList.toggle('active',a.dataset.sec===id));
+}});},{rootMargin:'-45% 0px -50% 0px',threshold:0});
+['home','about','services','skills','experience','certs','terminal','contact']
+  .forEach(id=>{const el=document.getElementById(id);if(el)spy.observe(el);});
+
+/* ============================================================
+   4. ROTATING TITLES (typewriter)
+   ============================================================ */
+const roles=['Azure Cloud Administrator','DevOps Engineer','Cloud Automation Specialist','Infrastructure & Security Engineer'];
+const rotEl=document.getElementById('rotator');
+let ri=0,ci=0,deleting=false;
+(function type(){
+  const word=roles[ri];
+  rotEl.textContent = word.slice(0,ci);
+  if(!deleting && ci<word.length){ci++;setTimeout(type,70);}
+  else if(!deleting && ci===word.length){deleting=true;setTimeout(type,1600);}
+  else if(deleting && ci>0){ci--;setTimeout(type,35);}
+  else{deleting=false;ri=(ri+1)%roles.length;setTimeout(type,300);}
+})();
+
+/* ============================================================
+   5. LIVE METRICS (fake but lively)
+   ============================================================ */
+const spark=document.getElementById('spark');
+for(let i=0;i<16;i++){const b=document.createElement('i');b.style.height=(6+Math.random()*18)+'px';spark.appendChild(b);}
+const cpuEl=document.getElementById('m-cpu'),latEl=document.getElementById('m-latency'),upEl=document.getElementById('m-uptime');
+function tick(){
+  cpuEl.style.width=(22+Math.random()*46).toFixed(0)+'%';
+  latEl.textContent=(28+Math.random()*40).toFixed(0)+' ms';
+  upEl.textContent=(99.9+Math.random()*0.09).toFixed(2)+'%';
+  [...spark.children].forEach(b=>b.style.height=(6+Math.random()*18)+'px');
+}
+tick();setInterval(tick,2200);
+
+/* ============================================================
+   6. REVEAL on scroll + counters
+   ============================================================ */
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){
+  e.target.classList.add('in');
+  if(e.target.classList.contains('stat')){const n=e.target.querySelector('[data-count]');if(n&&!n.dataset.done){countUp(n);n.dataset.done=1;}}
+  io.unobserve(e.target);
+}});},{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+function countUp(el){
+  const target=+el.getAttribute('data-count');const suf=el.querySelector('.suf');
+  let v=0;const step=Math.max(1,Math.ceil(target/28));
+  const t=setInterval(()=>{v+=step;if(v>=target){v=target;clearInterval(t);}
+    el.firstChild.textContent=v;},34);
+}
+
+/* ============================================================
+   7. INTERACTIVE TERMINAL
+   ============================================================ */
+const screen=document.getElementById('termScreen'),input=document.getElementById('term-input');
+const history=[];let hIdx=-1;
+function out(html,cls=''){const d=document.createElement('div');d.className='term-line '+cls;d.innerHTML=html;screen.appendChild(d);screen.scrollTop=screen.scrollHeight;}
+function prompt(cmd){out(`<span class="term-prompt">sabz@azure</span>:<span class="term-path">~</span>$ ${cmd}`);}
+const COMMANDS={
+  help(){return `Available commands:
+  <span class="term-accent">about</span>       who I am
+  <span class="term-accent">whoami</span>      short bio
+  <span class="term-accent">skills</span>      tech stack
+  <span class="term-accent">experience</span>  work history   (alias: exp)
+  <span class="term-accent">certs</span>       certifications
+  <span class="term-accent">education</span>   degree
+  <span class="term-accent">contact</span>     how to reach me
+  <span class="term-accent">social</span>      links
+  <span class="term-accent">neofetch</span>    system info
+  <span class="term-accent">resume</span>      download CV
+  <span class="term-accent">theme</span>       toggle light/dark
+  <span class="term-accent">lang</span>        toggle EN/UR
+  <span class="term-accent">clear</span>       clear the screen`;},
+  about(){return `Sabz Ali — Azure Cloud Administrator @ Contour Software (Karachi, hybrid).
+I design, secure, and automate cloud infrastructure on Microsoft Azure:
+IaC (ARM/Terraform), CI/CD, observability, governance, and backup/BCDR.`;},
+  whoami(){return `sabz — cloud/devops engineer · AZ-104 & AI-900 certified · based in Karachi, PK (GMT+5).`;},
+  skills(){return `<span class="term-accent">Cloud:</span>    Azure, AWS, ARM, Azure Monitor, Entra ID, M365
+<span class="term-accent">IaC/CD:</span>   Terraform, Ansible, GitHub Actions, Jenkins, Docker
+<span class="term-accent">Security:</span> Sentinel, Defender for Cloud, CrowdStrike, Rapid7, RBAC, NSG
+<span class="term-accent">Systems:</span>  Linux, Windows Server, VMware ESXi, Hyper-V, AD
+<span class="term-accent">Ops:</span>      Veeam, Cove, SolarWinds RMM, Datto, Meraki`;},
+  experience(){return `[2023—now] Azure Cloud Administrator · Contour Software
+[2023]     Trainee DevOps Engineer · Contour Software
+[2022—23]  Technical Support Executive · Eplanet Global
+type 'exp <n>' ... just kidding — scroll to the Experience section for details.`;},
+  certs(){return `✓ AZ-900 — Microsoft Certified: Azure Fundamentals
+✓ AZ-104 — Microsoft Certified: Azure Administrator Associate
+✓ AZ-305 — Microsoft Certified: Azure Solutions Architect Expert
+✓ AI-900 — Microsoft Certified: Azure AI Fundamentals`;},
+  education(){return `B.S. Computer Science — Iqra University, Karachi (2017–2021), CGPA 3.01/4.0`;},
+  contact(){return `email : <span class="term-accent">sabzalikhan333@gmail.com</span>
+phone : +92 347 8203915
+status: open to work · response < 24h`;},
+  social(){return `linkedin : <span class="term-accent">linkedin.com/in/sabzalikhan</span>
+email    : <span class="term-accent">sabzalikhan333@gmail.com</span>
+phone    : +92 347 8203915`;},
+  neofetch(){return `<span class="term-accent">        .--.       </span>  sabz@azure
+<span class="term-accent">       |o_o |      </span>  ----------
+<span class="term-accent">       |:_/ |      </span>  OS:    Azure Cloud
+<span class="term-accent">      //   \\ \\     </span>  Role:  Cloud Administrator
+<span class="term-accent">     (|     | )    </span>  Certs: AZ-900, AZ-104, AZ-305, AI-900
+<span class="term-accent">    /'\\_   _/\`\\   </span>  Loc:   Karachi, PK (GMT+5)
+<span class="term-accent">    \\___)=(___/   </span>  Uptime: 99.98%`;},
+  resume(){window.location.href='Sabz-Ali-Resume.pdf';return 'downloading Sabz-Ali-Resume.pdf …';},
+  theme(){themeBtn.click();return 'theme toggled.';},
+  lang(){langBtn.click();return 'language toggled.';},
+  clear(){screen.innerHTML='';return null;},
+  banner(){return `<span class="term-accent">
+ ____       _              _    _ _
+/ ___|  __ _| |__ ____   / \\  | (_)
+\\___ \\ / _\` | '_ \\_  /  / _ \\ | | |
+ ___) | (_| | |_) / /  / ___ \\| | |
+|____/ \\__,_|_.__/___|/_/   \\_\\_|_|</span>
+Cloud Engineer · DevOps & Automation · type 'help'`;}
+};
+COMMANDS.exp=COMMANDS.experience; COMMANDS.cls=COMMANDS.clear; COMMANDS.ls=()=>'about  skills  experience  certs  education  contact  resume';
+COMMANDS.cv=COMMANDS.resume; COMMANDS.links=COMMANDS.social;
+function run(raw){
+  const cmd=raw.trim();if(!cmd)return;
+  history.unshift(cmd);hIdx=-1;prompt(cmd);
+  const key=cmd.toLowerCase().split(' ')[0];
+  if(key in COMMANDS){const r=COMMANDS[key]();if(r!=null)out(r);}
+  else if(key==='sudo'){out(`<span class="term-warn">nice try. permission denied — this operator runs least-privilege. 😏</span>`);}
+  else if(key==='echo'){out(cmd.slice(5));}
+  else{out(`command not found: ${key}. type '<span class="term-accent">help</span>' for options.`,'term-warn');}
+}
+input.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){run(input.value);input.value='';}
+  else if(e.key==='ArrowUp'){if(hIdx<history.length-1){hIdx++;input.value=history[hIdx]||'';}}
+  else if(e.key==='ArrowDown'){if(hIdx>0){hIdx--;input.value=history[hIdx]||'';}else{hIdx=-1;input.value='';}}
+});
+document.getElementById('terminal').addEventListener('click',()=>input.focus());
+COMMANDS.banner();out(COMMANDS.banner());
+out(`<span class="term-muted">Welcome. Type '<span class="term-accent">help</span>' to see what I can do.</span>`);
+
+/* ============================================================
+   8. COMMAND PALETTE (Ctrl/⌘ + K)
+   ============================================================ */
+const overlay=document.getElementById('cmdkOverlay'),cInput=document.getElementById('cmdkInput'),cList=document.getElementById('cmdkList');
+const CMDK=[
+  {i:'▸',t:'About',s:'section',go:()=>jump('#about')},
+  {i:'▸',t:'Services',s:'section',go:()=>jump('#services')},
+  {i:'▸',t:'Skills',s:'section',go:()=>jump('#skills')},
+  {i:'▸',t:'Experience',s:'section',go:()=>jump('#experience')},
+  {i:'▸',t:'Certifications',s:'section',go:()=>jump('#certs')},
+  {i:'▸',t:'Terminal',s:'section',go:()=>jump('#terminal')},
+  {i:'▸',t:'Contact',s:'section',go:()=>jump('#contact')},
+  {i:'✉',t:'Email Sabz',s:'action',go:()=>location.href='mailto:sabzalikhan333@gmail.com'},
+  {i:'⭳',t:'Download CV',s:'action',go:()=>location.href='Sabz-Ali-Resume.pdf'},
+  {i:'☾',t:'Toggle theme',s:'action',go:()=>themeBtn.click()},
+  {i:'⌘',t:'Toggle language (EN/UR)',s:'action',go:()=>langBtn.click()},
+];
+let cActive=0;
+function jump(sel){closeCmdk();document.querySelector(sel).scrollIntoView();}
+function renderCmdk(f=''){
+  const items=CMDK.filter(c=>c.t.toLowerCase().includes(f.toLowerCase()));
+  cList.innerHTML='';
+  items.forEach((c,idx)=>{
+    const d=document.createElement('div');d.className='cmdk-item'+(idx===cActive?' active':'');
+    d.innerHTML=`<span class="ci">${c.i}</span>${c.t}<small>${c.s}</small>`;
+    d.onclick=c.go;cList.appendChild(d);
+  });
+  cList._items=items;
+}
+function openCmdk(){overlay.classList.add('open');cInput.value='';cActive=0;renderCmdk();setTimeout(()=>cInput.focus(),30);}
+function closeCmdk(){overlay.classList.remove('open');}
+document.getElementById('openCmdk').onclick=openCmdk;
+overlay.onclick=e=>{if(e.target===overlay)closeCmdk();};
+cInput.oninput=()=>{cActive=0;renderCmdk(cInput.value);};
+cInput.onkeydown=e=>{
+  const items=cList._items||[];
+  if(e.key==='ArrowDown'){e.preventDefault();cActive=Math.min(cActive+1,items.length-1);renderCmdk(cInput.value);}
+  else if(e.key==='ArrowUp'){e.preventDefault();cActive=Math.max(cActive-1,0);renderCmdk(cInput.value);}
+  else if(e.key==='Enter'){items[cActive]&&items[cActive].go();}
+  else if(e.key==='Escape'){closeCmdk();}
+};
+addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();overlay.classList.contains('open')?closeCmdk():openCmdk();}
+});
+
+/* ============================================================
+   9. misc
+   ============================================================ */
+const yr=new Date().getFullYear();
+document.getElementById('year').textContent=yr;
+const ySb=document.getElementById('yearSb'); if(ySb) ySb.textContent=yr;
+
+/* back to top */
+const toTop=document.getElementById('toTop');
+addEventListener('scroll',()=>toTop.classList.toggle('show',scrollY>400));
+toTop.onclick=()=>smoothTo(0);
+</script>
+</body>
+</html>
